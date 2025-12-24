@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Quiz Result</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="min-h-screen bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 flex items-center justify-center">
+
+<div class="bg-white rounded-3xl shadow-2xl p-10 w-full max-w-lg text-center">
+
+    <!-- Success Icon -->
+    <div class="w-20 h-20 mx-auto mb-6 rounded-full bg-green-100 flex items-center justify-center">
+        <span class="text-4xl">🎉</span>
+    </div>
+
+    <!-- Title -->
+    <h1 class="text-3xl font-bold text-gray-800 mb-2">
+        Quiz Completed!
+    </h1>
+    <p class="text-gray-500 mb-6">
+        Here is your final score
+    </p>
+
+    <!-- Score Box -->
+    <div class="bg-indigo-50 rounded-2xl p-6 mb-8">
+        <p class="text-gray-600 text-lg">Your Score</p>
+        <h2 class="text-5xl font-extrabold text-indigo-600 mt-2">
+            <span id="score">0</span> / <span id="total">0</span>
+        </h2>
+    </div>
+
+    <!-- Buttons -->
+    <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <a href="index.html"
+           class="px-8 py-3 rounded-xl bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium transition">
+            ⬅ Back to Home
+        </a>
+
+        <a href="quiz.html"
+           class="px-8 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-medium transition">
+            🔄 Play Again
+        </a>
+    </div>
+
+</div>
+
+<script>
+    /* =========================
+       DJANGO / JS SCORE SUPPORT
+       =========================
+       Option 1 (JS redirect):
+       localStorage.setItem("score", score);
+       localStorage.setItem("total", total);
+
+       Option 2 (Django):
+       const score = {{ score }};
+       const total = {{ total }};
+    */
+
+    const score = localStorage.getItem("score") || 0;
+    const total = localStorage.getItem("total") || 0;
+
+    document.getElementById("score").textContent = score;
+    document.getElementById("total").textContent = total;
+</script>
+
+</body>
+</html>

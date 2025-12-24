@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Quiz</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="min-h-screen bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 flex items-center justify-center">
+
+<div class="w-full max-w-3xl bg-white rounded-2xl shadow-2xl p-8">
+
+    <!-- Header -->
+    <div class="text-center mb-8">
+        <h1 class="text-3xl font-bold text-gray-800">Programming Quiz</h1>
+        <p class="text-gray-500 mt-2">Choose the correct answer</p>
+    </div>
+
+    <!-- Progress -->
+    <div class="mb-6">
+        <div class="flex justify-between text-sm text-gray-500 mb-2">
+            <span id="progressText">Question 1</span>
+            <span id="totalQuestions">Total: 0</span>
+        </div>
+        <div class="w-full bg-gray-200 rounded-full h-2">
+            <div id="progressBar" class="bg-indigo-600 h-2 rounded-full transition-all"></div>
+        </div>
+    </div>
+
+    <!-- Question -->
+    <div id="question"
+         class="text-xl font-semibold text-gray-800 mb-6">
+        Question text
+    </div>
+
+    <!-- Options -->
+    <form id="options" class="space-y-4">
+        <!-- injected by JS -->
+    </form>
+
+    <!-- Button -->
+    <div class="mt-8 text-right">
+        <button id="nextBtn"
+                class="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-xl font-medium disabled:opacity-40 disabled:cursor-not-allowed transition"
+                disabled>
+            Next →
+        </button>
+    </div>
+
+</div>
+
+<script>
+    /* ===============================
+       BACKEND DATA (Django Ready)
+       ===============================
+       Replace this with Django context:
+       const quizData = {{ questions|safe }};
+    */
+
+    const quizData = [
+        {
+            id: 1,
+            question: "What is Django?",
+            options: [
+                "A Python framework",
+                "A database",
+                "A programming language",
+                "A server"
+            ],
+            answer: 0
+        },
+        {
+            id: 2,
+            question: "Which ORM is used in Django?",
+            options: [
+                "Sequelize",
+                "Hibernate",
+                "Django ORM",
+                "SQLAlchemy"
+            ],
+            answer: 2
+        }
+    ];
+
+    let currentIndex = 0;
+    let selectedOption = null;
+
+    const questionEl = document.getElementById("question");
+    const optionsEl = document.getElementById("options");
+    const nextBtn = document.getElementById("nextBtn");
+    const progressText = document.getElementById("progressText");
+    const totalQuestions = document.getElementById("totalQuestions");
+    const progressBar = document.getElementById("progressBar");
+
+    totalQuestions.textContent = `Total: ${quizData.length}`;
+
+    function renderQuestion() {
+        selectedOption = null;
+        nextBtn.disabled = true;
+
+        const q = quizData[currentIndex];
+
+        questionEl.textContent = q.question;
+        progressText.textContent = `Question ${currentIndex + 1}`;
+        progressBar.style.width = `${((currentIndex + 1) / quizData.length) * 100}%`;
+
+        optionsEl.innerHTML = "";
+
+        q.options.forEach((option, index) => {
+            const optionHTML = `
+                <label class="flex items-center gap-4 p-4 border rounded-xl cursor-pointer
+                              hover:bg-indigo-50 transition">
+                    <input type="radio" name="option" value="${index}"
+                           class="w-5 h-5 accent-indigo-600">
+                    <span class="text-gray-700 text-lg">${option}</span>
+                </label>
+            `;
+            optionsEl.insertAdjacentHTML("beforeend", optionHTML);
+        });
+
+        document.querySelectorAll("input[name='option']").forEach(input => {
+            input.addEventListener("change", () => {
+                selectedOption = parseInt(input.value);
+                nextBtn.disabled = false;
+            });
+        });
+    }
+
+    nextBtn.addEventListener("click", () => {
+        if (selectedOption === null) return;
+
+        currentIndex++;
+
+        if (currentIndex < quizData.length) {
+            renderQuestion();
+        } else {
+            questionEl.innerHTML = "🎉 Quiz Completed!";
+            optionsEl.innerHTML = `
+                <p class="text-center text-green-600 font-semibold text-lg">
+                    You have completed the quiz successfully.
+                </p>
+            `;
+            nextBtn.style.display = "none";
+            progressBar.style.width = "100%";
+        }
+    });
+
+    renderQuestion();
+</script>
+
+</body>
+</html>
