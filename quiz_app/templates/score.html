@@ -4,6 +4,13 @@
     <meta charset="UTF-8">
     <title>Quiz Result</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+    // Prevent back button
+    history.pushState(null, null, location.href);
+    window.onpopstate = function () {
+        history.go(1);
+    };
+</script>
 </head>
 
 <body class="min-h-screen bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 flex items-center justify-center">
@@ -33,12 +40,12 @@
 
     <!-- Buttons -->
     <div class="flex flex-col sm:flex-row gap-4 justify-center">
-        <a href="index.html"
+        <a href="{% url 'quiz_list' %}"
            class="px-8 py-3 rounded-xl bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium transition">
             ⬅ Back to Home
         </a>
 
-        <a href="quiz.html"
+        <a href="{% url 'question' quiz_id %}"
            class="px-8 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-medium transition">
             🔄 Play Again
         </a>
@@ -59,12 +66,15 @@
        const total = {{ total }};
     */
 
-    const score = localStorage.getItem("score") || 0;
-    const total = localStorage.getItem("total") || 0;
+    const score = {{score_count}}
+    const total = {{out_off}}
 
     document.getElementById("score").textContent = score;
     document.getElementById("total").textContent = total;
 </script>
+
+
+
 
 </body>
 </html>

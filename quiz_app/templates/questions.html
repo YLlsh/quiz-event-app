@@ -8,7 +8,15 @@
 
 <body class="min-h-screen bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 flex items-center justify-center">
 
-<div class="w-full max-w-3xl bg-white rounded-2xl shadow-2xl p-8">
+<div class="relative w-full max-w-3xl bg-white rounded-2xl shadow-2xl p-8">
+
+    <!-- Cancel Quiz Button (Top Right) -->
+    <a href="{% url 'quiz_list' %}"
+       class="absolute top-4 right-4 px-4 py-2 text-sm font-semibold 
+              text-indigo-600 bg-indigo-50 rounded-xl shadow 
+              hover:bg-indigo-100 hover:scale-105 transition">
+        ✖ Cancel Quiz
+    </a>
 
     <!-- Header -->
     <div class="text-center mb-8">
@@ -35,11 +43,11 @@
     </div>
 
     <!-- Form -->
-    <form method="post" action="{% url 'score' %}" id="quizForm">
+    <form method="post" action="{% url 'score' quiz_id %}" id="quizForm">
         {% csrf_token %}
         <input type="hidden" name="q_id[]" id="q_id">
 
-        <!-- Options injected here -->
+        <!-- Options -->
         <div id="options" class="space-y-4"></div>
 
         <!-- Buttons -->
@@ -65,118 +73,105 @@
 
 </div>
 
+<!-- JS stays exactly the same -->
 <script>
-    /* ===============================
-       Django data
-       =============================== */
-    const quizData = {{ quiz_data|safe }}; // Replace with your Django context
+/* ===============================
+   Django data
+   =============================== */
+const quizData = {{ quiz_data|safe }};
 
-    /* ===============================
-       State
-       =============================== */
-    let currentIndex = 0;
-    let selectedOption = null;
-    const userAnswers = {};
+/* ===============================
+   State
+   =============================== */
+let currentIndex = 0;
+let selectedAnswerId = null;
+const userAnswers = {};
 
-    /* ===============================
-       Elements
-       =============================== */
-    const questionEl = document.getElementById("question");
-    const q_id = document.getElementById("q_id");
-    const optionsEl = document.getElementById("options");
-    const nextBtn = document.getElementById("nextBtn");
-    const backBtn = document.getElementById("backBtn");
-    const submitBtn = document.getElementById("submitBtn");
-    const progressText = document.getElementById("progressText");
-    const totalQuestions = document.getElementById("totalQuestions");
-    const progressBar = document.getElementById("progressBar");
-    const quizForm = document.getElementById("quizForm");
+/* ===============================
+   Elements
+   =============================== */
+const questionEl = document.getElementById("question");
+const q_id = document.getElementById("q_id");
+const optionsEl = document.getElementById("options");
+const nextBtn = document.getElementById("nextBtn");
+const backBtn = document.getElementById("backBtn");
+const submitBtn = document.getElementById("submitBtn");
+const progressText = document.getElementById("progressText");
+const totalQuestions = document.getElementById("totalQuestions");
+const progressBar = document.getElementById("progressBar");
+const quizForm = document.getElementById("quizForm");
 
-    totalQuestions.textContent = `Total: ${quizData.length}`;
+totalQuestions.textContent = `Total: ${quizData.length}`;
 
-    /* ===============================
-       Render Question
-       =============================== */
-    function renderQuestion() {
-        const q = quizData[currentIndex];
-        selectedOption = userAnswers[q.id] ?? null;
+function renderQuestion() {
+    const q = quizData[currentIndex];
 
-        questionEl.textContent = q.question;
-        q_id.value = q.id;
+    selectedAnswerId = userAnswers[q.id] ?? null;
 
-        progressText.textContent = `Question ${currentIndex + 1}`;
-        progressBar.style.width = `${((currentIndex + 1) / quizData.length) * 100}%`;
+    questionEl.textContent = q.question;
+    q_id.value = q.id;
 
-        // Clear old options
-        optionsEl.innerHTML = "";
+    progressText.textContent = `Question ${currentIndex + 1}`;
+    progressBar.style.width = `${((currentIndex + 1) / quizData.length) * 100}%`;
 
-        // Add new options
-        q.options.forEach((option, index) => {
-            const checked = selectedOption === index ? "checked" : "";
-            optionsEl.insertAdjacentHTML("beforeend", `
-                <label class="flex items-center gap-4 p-4 border rounded-xl cursor-pointer hover:bg-indigo-50 transition">
-                    <input type="radio" name="option" value="${index}" ${checked}
-                           class="w-5 h-5 accent-indigo-600">
-                    <span class="text-gray-700 text-lg">${option}</span>
-                </label>
-            `);
+    optionsEl.innerHTML = "";
+
+    q.options.forEach(([text, answerId]) => {
+        const checked = selectedAnswerId === answerId ? "checked" : "";
+        optionsEl.insertAdjacentHTML("beforeend", `
+            <label class="flex items-center gap-4 p-4 border rounded-xl cursor-pointer hover:bg-indigo-50 transition">
+                <input type="radio" name="option" value="${answerId}" ${checked}
+                       class="w-5 h-5 accent-indigo-600">
+                <span class="text-gray-700 text-lg">${text}</span>
+            </label>
+        `);
+    });
+
+    document.querySelectorAll("input[name='option']").forEach(input => {
+        input.addEventListener("change", () => {
+            selectedAnswerId = parseInt(input.value);
+            userAnswers[q.id] = selectedAnswerId;
+            nextBtn.disabled = false;
         });
+    });
 
-        // Event listener for option selection
-        document.querySelectorAll("input[name='option']").forEach(input => {
-            input.addEventListener("change", () => {
-                selectedOption = parseInt(input.value);
-                userAnswers[q.id] = selectedOption;
-                nextBtn.disabled = false;
-            });
-        });
+    backBtn.disabled = currentIndex === 0;
+    nextBtn.disabled = selectedAnswerId === null;
 
-        // Back button state
-        backBtn.disabled = currentIndex === 0;
-
-        // Next/Submit buttons
-        nextBtn.disabled = selectedOption === null;
-        if (currentIndex === quizData.length - 1) {
-            nextBtn.classList.add("hidden");
-            submitBtn.classList.remove("hidden");
-        } else {
-            nextBtn.classList.remove("hidden");
-            submitBtn.classList.add("hidden");
-        }
+    if (currentIndex === quizData.length - 1) {
+        nextBtn.classList.add("hidden");
+        submitBtn.classList.remove("hidden");
+    } else {
+        nextBtn.classList.remove("hidden");
+        submitBtn.classList.add("hidden");
     }
+}
 
-    /* ===============================
-       Button Events
-       =============================== */
-    backBtn.addEventListener("click", () => {
-        if (currentIndex > 0) {
-            currentIndex--;
-            renderQuestion();
-        }
-    });
-
-    nextBtn.addEventListener("click", () => {
-        if (selectedOption === null) return;
-        currentIndex++;
+backBtn.addEventListener("click", () => {
+    if (currentIndex > 0) {
+        currentIndex--;
         renderQuestion();
-    });
+    }
+});
 
-    submitBtn.addEventListener("click", () => {
-        // Append user answers as hidden inputs
-        for (const [qId, ans] of Object.entries(userAnswers)) {
-            const input = document.createElement("input");
-            input.type = "hidden";
-            input.name = "answers[]";
-            input.value = `${qId}:${ans}`;
-            quizForm.appendChild(input);
-        }
-        quizForm.submit();
-    });
-
-    /* ===============================
-       Init
-       =============================== */
+nextBtn.addEventListener("click", () => {
+    if (selectedAnswerId === null) return;
+    currentIndex++;
     renderQuestion();
+});
+
+submitBtn.addEventListener("click", () => {
+    for (const [qId, answerId] of Object.entries(userAnswers)) {
+        const input = document.createElement("input");
+        input.type = "hidden";
+        input.name = "answers[]";
+        input.value = `${qId}:${answerId}`;
+        quizForm.appendChild(input);
+    }
+    quizForm.submit();
+});
+
+renderQuestion();
 </script>
 
 </body>

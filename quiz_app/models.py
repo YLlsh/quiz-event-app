@@ -26,3 +26,13 @@ class Answer(models.Model):
 
     def __str__(self):
         return self.text
+
+class Event(models.Model):
+    # id is automatically created by Django as the primary key
+    title = models.CharField(max_length=200)
+    description = models.TextField()
+    date = models.DateTimeField()  # or DateField if you only need date
+    location = models.CharField(max_length=200)
+
+    def __str__(self):
+        return self.title

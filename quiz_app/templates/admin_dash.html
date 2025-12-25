@@ -80,6 +80,11 @@
     <div class="bg-white rounded-2xl w-full max-w-3xl p-6 mb-10">
         <h2 class="text-xl font-bold mb-1">Add Question</h2>
 
+        <div id="questionError"
+            class="hidden mb-4 p-3 rounded-lg bg-red-100 text-red-700 text-sm font-medium">
+            Please select at least one correct answer.
+        </div>
+
         <form method="post" action="{% url 'add_question' %}" id="questionForm">
             {% csrf_token %}
 
@@ -113,6 +118,7 @@
                 </div>
             </div>
 
+            
             <!-- Add Answer Button -->
             <button type="button" onclick="addAnswer()"
                     class="mt-4 text-indigo-600 font-medium">
@@ -138,19 +144,24 @@
 <div id="eventModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
     <div class="bg-white rounded-2xl w-full max-w-md p-6">
         <h2 class="text-xl font-bold mb-4">Add Event</h2>
-        <form method="post">
+        <form method="post" action="{% url 'add_event' %}">
             {% csrf_token %}
-            <input type="text" name="event_title" required
+            <input type="text" name="title" required
                    placeholder="Event Title"
+                   class="w-full border rounded-lg px-4 py-3 mb-3" required>
+            
+            <input type="text" name="description"
+                   placeholder="Event Description"
+                   class="w-full border rounded-lg px-4 py-3 mb-4" required>
+
+            <input type="date" name="date" required
                    class="w-full border rounded-lg px-4 py-3 mb-3">
-            <input type="date" name="event_date" required
-                   class="w-full border rounded-lg px-4 py-3 mb-3">
-            <input type="text" name="event_location" required
+
+            <input type="text" name="location" required
                    placeholder="Event Location"
                    class="w-full border rounded-lg px-4 py-3 mb-3">
-            <input type="text" name="event_label"
-                   placeholder="Event Label (Optional)"
-                   class="w-full border rounded-lg px-4 py-3 mb-4">
+
+
             <div class="flex justify-end gap-3">
                 <button type="button" onclick="closeModal('eventModal')"
                         class="px-4 py-2 bg-gray-200 rounded-lg">
@@ -164,9 +175,116 @@
         </form>
     </div>
 </div>
+<!-- ================= DATA TABLES ================= -->
+<!-- ================= DATA TABLES (ROW) ================= -->
+<section class="mt-12">
+
+    <div class="flex flex-wrap gap-6">
+
+        <!-- ================= QUIZ TABLE ================= -->
+        <div class="flex-1 min-w-[300px] bg-white rounded-xl shadow p-5">
+            <h2 class="text-lg font-bold mb-4">📘 Quiz List</h2>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm border-collapse">
+                    <thead>
+                        <tr class="bg-gray-100 text-left">
+                            <th class="p-2 border">#</th>
+                            <th class="p-2 border">Quiz</th>
+                            <th class="p-2 border">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for quiz in quiz_data %}
+                        <tr class="hover:bg-gray-50">
+                            <td class="p-2 border">{{ forloop.counter }}</td>
+                            <td class="p-2 border">{{ quiz.title }}</td>
+                            <td class="p-2 border">{{ quiz.title }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="2" class="p-3 text-center text-gray-500">
+                                No quiz found
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ================= QUESTION TABLE ================= -->
+        <div class="flex-1 min-w-[300px] bg-white rounded-xl shadow p-5">
+            <h2 class="text-lg font-bold mb-4">❓ Questions</h2>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm border-collapse">
+                    <thead>
+                        <tr class="bg-gray-100 text-left">
+                            <th class="p-2 border">#</th>
+                            <th class="p-2 border">Question</th>
+                            <th class="p-2 border">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for q in question_data %}
+                        <tr class="hover:bg-gray-50">
+                            <td class="p-2 border">{{ forloop.counter }}</td>
+                            <td class="p-2 border">{{ q.text }}</td>
+                            <td class="p-2 border">{{ q.text }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="2" class="p-3 text-center text-gray-500">
+                                No questions found
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ================= EVENT TABLE ================= -->
+        <div class="flex-1 min-w-[300px] bg-white rounded-xl shadow p-5">
+            <h2 class="text-lg font-bold mb-4">📅 Events</h2>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm border-collapse">
+                    <thead>
+                        <tr class="bg-gray-100 text-left">
+                            <th class="p-2 border">#</th>
+                            <th class="p-2 border">Title</th>
+                            <th class="p-2 border">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for event in event_data %}
+                        <tr class="hover:bg-gray-50">
+                            <td class="p-2 border">{{ forloop.counter }}</td>
+                            <td class="p-2 border">{{ event.title }}</td>
+                            <td class="p-2 border">{{ event.title }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="2" class="p-3 text-center text-gray-500">
+                                No events found
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+
 
 <!-- ================= SCRIPT ================= -->
 <script>
+/* ================= OPEN / CLOSE MODALS ================= */
 function openModal(id) {
     document.getElementById(id).classList.remove("hidden");
 }
@@ -175,12 +293,14 @@ function closeModal(id) {
     document.getElementById(id).classList.add("hidden");
 }
 
+/* ================= ELEMENTS ================= */
+const qTypeSelect = document.querySelector('select[name="q_type"]');
+const answersContainer = document.getElementById("answersContainer");
+const errorBox = document.getElementById("questionError");
+
+/* ================= ADD ANSWER FUNCTION (MCQ) ================= */
 let answerIndex = 1;
-
-// ================= ADD ANSWER =================
 function addAnswer() {
-    const container = document.getElementById("answersContainer");
-
     const div = document.createElement("div");
     div.className = "flex items-center gap-3 answer-item";
 
@@ -190,19 +310,65 @@ function addAnswer() {
         <input type="text" name="answers[]" placeholder="Answer option" class="w-full border rounded-lg px-3 py-2" required>
     `;
 
-    container.appendChild(div);
+    answersContainer.appendChild(div);
     answerIndex++;
 }
 
-// ================= SET RADIO VALUES ON SUBMIT =================
-document.getElementById('questionForm').addEventListener('submit', function() {
+/* ================= SHOW/HIDE ANSWERS BASED ON QUESTION TYPE ================= */
+qTypeSelect.addEventListener('change', function() {
+    const type = this.value;
+    answersContainer.innerHTML = ''; // clear previous answers
+
+    if (type === "MCQ") {
+        // Show one empty answer input
+        addAnswer();
+        document.getElementById("addAnswerBtn")?.classList.remove("hidden"); // show Add Answer button
+    } else if (type === "TF") {
+        // Show only True/False read-only options
+        ["True", "False"].forEach((val) => {
+            const div = document.createElement("div");
+            div.className = "flex items-center gap-3 answer-item";
+            div.innerHTML = `
+                <input type="hidden" name="correct_answer[]" value="0">
+                <input type="radio" name="select_correct" class="correct-radio">
+                <input type="text" name="answers[]" value="${val}" readonly class="w-full border rounded-lg px-3 py-2 bg-gray-100 cursor-not-allowed">
+            `;
+            answersContainer.appendChild(div);
+        });
+        document.getElementById("addAnswerBtn")?.classList.add("hidden"); // hide Add Answer button
+    }
+});
+
+/* ================= VALIDATE FORM ON SUBMIT ================= */
+document.getElementById('questionForm').addEventListener('submit', function (e) {
     const radios = document.querySelectorAll('.correct-radio');
+
+    let oneChecked = false;
+    radios.forEach((radio) => { if (radio.checked) oneChecked = true; });
+
+    if (!oneChecked) {
+        e.preventDefault();
+        errorBox.classList.remove('hidden');
+        errorBox.scrollIntoView({ behavior: "smooth", block: "start" });
+        return;
+    }
+
+    errorBox.classList.add('hidden');
+
     radios.forEach((radio) => {
         const hiddenInput = radio.parentElement.querySelector('input[type="hidden"]');
         hiddenInput.value = radio.checked ? "1" : "0";
     });
 });
+
+/* ================= HIDE ERROR WHEN RADIO CLICKED ================= */
+answersContainer.addEventListener('change', function(e) {
+    if (e.target.classList.contains('correct-radio')) {
+        errorBox.classList.add('hidden');
+    }
+});
 </script>
+
 
 </body>
 </html>

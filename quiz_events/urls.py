@@ -21,13 +21,15 @@ from quiz_app.views import *
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path('',home),
+    path('',home, name="home"),
+    path('event/',event,name="event"),
     path('quiz_list/',quiz_list,name="quiz_list"),
     path('question/<int:id>/',question,name="question"),
-    path('score/',score,name="score"),
+    path('score/<int:quiz_id>/',score,name="score"),
 
     path('add_quiz/',add_quiz,name="add_quiz"),
     path('add_question/',add_question,name="add_question"),
+    path('add_event/',add_event,name="add_event"),
 
     path('login/',log_in,name="login"),
     path('admin_dash/',admin_dash,name="admin_dash"),
