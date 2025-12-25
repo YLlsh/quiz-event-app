@@ -24,17 +24,15 @@
     <!-- Django Messages -->
     {% if messages %}
         {% for message in messages %}
-            <div class="mb-4 text-sm text-red-600 bg-red-50 p-3 rounded-lg">
+            <div>
                 {{ message }}
             </div>
         {% endfor %}
     {% endif %}
 
     <!-- Login Form -->
-     {% if messages %}
-     {{ message }}
-     {% endif %}
      
+
     <form method="post" class="space-y-5">
         {% csrf_token %}
 

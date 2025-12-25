@@ -21,49 +21,17 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
             
             <!-- Python -->
-            <a href="quiz.html?subject=python"
+             {% for i in quiz_list %}
+            <a href="{% url 'question' i.id %}"
                class="group bg-blue-50 hover:bg-blue-600 transition rounded-xl p-6 text-center shadow-md">
                 <h2 class="text-xl font-semibold text-blue-700 group-hover:text-white">
-                    Python
+                    {{i.title}}
                 </h2>
                 <p class="text-sm text-gray-500 group-hover:text-blue-100 mt-2">
-                    Backend & Logic
+                    {{i.description}}
                 </p>
             </a>
-
-            <!-- Java -->
-            <a href="quiz.html?subject=java"
-               class="group bg-red-50 hover:bg-red-600 transition rounded-xl p-6 text-center shadow-md">
-                <h2 class="text-xl font-semibold text-red-700 group-hover:text-white">
-                    Java
-                </h2>
-                <p class="text-sm text-gray-500 group-hover:text-red-100 mt-2">
-                    OOP Concepts
-                </p>
-            </a>
-
-            <!-- C -->
-            <a href="quiz.html?subject=c"
-               class="group bg-green-50 hover:bg-green-600 transition rounded-xl p-6 text-center shadow-md">
-                <h2 class="text-xl font-semibold text-green-700 group-hover:text-white">
-                    C
-                </h2>
-                <p class="text-sm text-gray-500 group-hover:text-green-100 mt-2">
-                    Fundamentals
-                </p>
-            </a>
-
-            <!-- C++ -->
-            <a href="quiz.html?subject=cpp"
-               class="group bg-purple-50 hover:bg-purple-600 transition rounded-xl p-6 text-center shadow-md">
-                <h2 class="text-xl font-semibold text-purple-700 group-hover:text-white">
-                    C++
-                </h2>
-                <p class="text-sm text-gray-500 group-hover:text-purple-100 mt-2">
-                    STL & OOP
-                </p>
-            </a>
-
+                {% endfor %}
         </div>
 
         <!-- Footer -->

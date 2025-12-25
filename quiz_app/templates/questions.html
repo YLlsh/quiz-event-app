@@ -23,7 +23,8 @@
             <span id="totalQuestions">Total: 0</span>
         </div>
         <div class="w-full bg-gray-200 rounded-full h-2">
-            <div id="progressBar" class="bg-indigo-600 h-2 rounded-full transition-all"></div>
+            <div id="progressBar"
+                 class="bg-indigo-600 h-2 rounded-full transition-all"></div>
         </div>
     </div>
 
@@ -33,118 +34,148 @@
         Question text
     </div>
 
-    <!-- Options -->
-    <form id="options" class="space-y-4">
-        <!-- injected by JS -->
-    </form>
+    <!-- Form -->
+    <form method="post" action="{% url 'score' %}" id="quizForm">
+        {% csrf_token %}
+        <input type="hidden" name="q_id[]" id="q_id">
 
-    <!-- Button -->
-    <div class="mt-8 text-right">
-        <button id="nextBtn"
-                class="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-xl font-medium disabled:opacity-40 disabled:cursor-not-allowed transition"
-                disabled>
-            Next →
-        </button>
-    </div>
+        <!-- Options injected here -->
+        <div id="options" class="space-y-4"></div>
+
+        <!-- Buttons -->
+        <div class="mt-8 flex justify-between">
+            <button type="button" id="backBtn"
+                    class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-8 py-3 rounded-xl font-medium disabled:opacity-40 disabled:cursor-not-allowed transition"
+                    disabled>
+                ← Back
+            </button>
+
+            <button type="button" id="nextBtn"
+                    class="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-xl font-medium disabled:opacity-40 disabled:cursor-not-allowed transition"
+                    disabled>
+                Next →
+            </button>
+
+            <button type="button" id="submitBtn"
+                    class="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-xl font-medium hidden transition">
+                Submit ✔
+            </button>
+        </div>
+    </form>
 
 </div>
 
 <script>
     /* ===============================
-       BACKEND DATA (Django Ready)
-       ===============================
-       Replace this with Django context:
-       const quizData = {{ questions|safe }};
-    */
+       Django data
+       =============================== */
+    const quizData = {{ quiz_data|safe }}; // Replace with your Django context
 
-    const quizData = [
-        {
-            id: 1,
-            question: "What is Django?",
-            options: [
-                "A Python framework",
-                "A database",
-                "A programming language",
-                "A server"
-            ],
-            answer: 0
-        },
-        {
-            id: 2,
-            question: "Which ORM is used in Django?",
-            options: [
-                "Sequelize",
-                "Hibernate",
-                "Django ORM",
-                "SQLAlchemy"
-            ],
-            answer: 2
-        }
-    ];
-
+    /* ===============================
+       State
+       =============================== */
     let currentIndex = 0;
     let selectedOption = null;
+    const userAnswers = {};
 
+    /* ===============================
+       Elements
+       =============================== */
     const questionEl = document.getElementById("question");
+    const q_id = document.getElementById("q_id");
     const optionsEl = document.getElementById("options");
     const nextBtn = document.getElementById("nextBtn");
+    const backBtn = document.getElementById("backBtn");
+    const submitBtn = document.getElementById("submitBtn");
     const progressText = document.getElementById("progressText");
     const totalQuestions = document.getElementById("totalQuestions");
     const progressBar = document.getElementById("progressBar");
+    const quizForm = document.getElementById("quizForm");
 
     totalQuestions.textContent = `Total: ${quizData.length}`;
 
+    /* ===============================
+       Render Question
+       =============================== */
     function renderQuestion() {
-        selectedOption = null;
-        nextBtn.disabled = true;
-
         const q = quizData[currentIndex];
+        selectedOption = userAnswers[q.id] ?? null;
 
         questionEl.textContent = q.question;
+        q_id.value = q.id;
+
         progressText.textContent = `Question ${currentIndex + 1}`;
         progressBar.style.width = `${((currentIndex + 1) / quizData.length) * 100}%`;
 
+        // Clear old options
         optionsEl.innerHTML = "";
 
+        // Add new options
         q.options.forEach((option, index) => {
-            const optionHTML = `
-                <label class="flex items-center gap-4 p-4 border rounded-xl cursor-pointer
-                              hover:bg-indigo-50 transition">
-                    <input type="radio" name="option" value="${index}"
+            const checked = selectedOption === index ? "checked" : "";
+            optionsEl.insertAdjacentHTML("beforeend", `
+                <label class="flex items-center gap-4 p-4 border rounded-xl cursor-pointer hover:bg-indigo-50 transition">
+                    <input type="radio" name="option" value="${index}" ${checked}
                            class="w-5 h-5 accent-indigo-600">
                     <span class="text-gray-700 text-lg">${option}</span>
                 </label>
-            `;
-            optionsEl.insertAdjacentHTML("beforeend", optionHTML);
+            `);
         });
 
+        // Event listener for option selection
         document.querySelectorAll("input[name='option']").forEach(input => {
             input.addEventListener("change", () => {
                 selectedOption = parseInt(input.value);
+                userAnswers[q.id] = selectedOption;
                 nextBtn.disabled = false;
             });
         });
+
+        // Back button state
+        backBtn.disabled = currentIndex === 0;
+
+        // Next/Submit buttons
+        nextBtn.disabled = selectedOption === null;
+        if (currentIndex === quizData.length - 1) {
+            nextBtn.classList.add("hidden");
+            submitBtn.classList.remove("hidden");
+        } else {
+            nextBtn.classList.remove("hidden");
+            submitBtn.classList.add("hidden");
+        }
     }
 
-    nextBtn.addEventListener("click", () => {
-        if (selectedOption === null) return;
-
-        currentIndex++;
-
-        if (currentIndex < quizData.length) {
+    /* ===============================
+       Button Events
+       =============================== */
+    backBtn.addEventListener("click", () => {
+        if (currentIndex > 0) {
+            currentIndex--;
             renderQuestion();
-        } else {
-            questionEl.innerHTML = "🎉 Quiz Completed!";
-            optionsEl.innerHTML = `
-                <p class="text-center text-green-600 font-semibold text-lg">
-                    You have completed the quiz successfully.
-                </p>
-            `;
-            nextBtn.style.display = "none";
-            progressBar.style.width = "100%";
         }
     });
 
+    nextBtn.addEventListener("click", () => {
+        if (selectedOption === null) return;
+        currentIndex++;
+        renderQuestion();
+    });
+
+    submitBtn.addEventListener("click", () => {
+        // Append user answers as hidden inputs
+        for (const [qId, ans] of Object.entries(userAnswers)) {
+            const input = document.createElement("input");
+            input.type = "hidden";
+            input.name = "answers[]";
+            input.value = `${qId}:${ans}`;
+            quizForm.appendChild(input);
+        }
+        quizForm.submit();
+    });
+
+    /* ===============================
+       Init
+       =============================== */
     renderQuestion();
 </script>
 

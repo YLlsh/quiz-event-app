@@ -23,10 +23,15 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path('',home),
     path('quiz_list/',quiz_list,name="quiz_list"),
-    path('question/',question,name="question"),
+    path('question/<int:id>/',question,name="question"),
     path('score/',score,name="score"),
+
+    path('add_quiz/',add_quiz,name="add_quiz"),
+    path('add_question/',add_question,name="add_question"),
 
     path('login/',log_in,name="login"),
     path('admin_dash/',admin_dash,name="admin_dash"),
     path('log_out/',log_out,name="log_out"),
+
+
 ]
