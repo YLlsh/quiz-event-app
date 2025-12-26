@@ -29,6 +29,13 @@ It also includes an **Admin Dashboard** to manage quizzes, questions, and events
 ### Admin Credentials
 - **Username:** `quiz_admin`
 - **Password:** `quiz123`
+  
+### Demo User Credentials
+- **Username:** `user1`
+- **Password:** `123`
+
+- **Username:** `user2`
+- **Password:** `123`
 
 
 ### Tech Stack
