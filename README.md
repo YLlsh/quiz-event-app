@@ -33,7 +33,7 @@ It also includes an **Admin Dashboard** to manage quizzes, questions, and events
 
 ### Tech Stack
 - **Backend:** Django (Python)  
-- **Frontend:** HTML, Tailwind CSS, JavaScript  
+- **Frontend:** HTML, Tailwind CSS, JavaScript ( use AI for frontend )
 - **Database:** SQLite (Default)
 
 
