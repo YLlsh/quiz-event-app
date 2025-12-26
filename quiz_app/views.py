@@ -11,7 +11,7 @@ from django.utils import timezone
 
 @login_required(login_url='login')
 def home(request):
-    quiz_history = UserSubmission.objects.all()
+    quiz_history = UserSubmission.objects.filter(user_name = request.user)
 
 
     return render(request,'home.html',{'quiz_history':quiz_history})
@@ -33,12 +33,12 @@ def quiz_list(request):
 @login_required(login_url='login')
 def question(request, id):
     quiz = get_object_or_404(Quiz, id=id)
-    questions = Question.objects.filter(quiz=quiz).prefetch_related('answer_set').order_by('?')[:10]
+    questions = Question.objects.filter(quiz=quiz).prefetch_related('answer_set').order_by('?')[:10]#its get max 10 question in unorder
 
     # this convert queryset to a list of dictionarie for js
     question_list = []
     for q in questions:
-        options = [(a.text ,a.id) for a in q.answer_set.all().order_by('?')[:4]] #its get max 10 question in unorder
+        options = [(a.text ,a.id) for a in q.answer_set.all().order_by('?')] 
    
         question_list.append({
             "id": q.id,
@@ -174,12 +174,12 @@ def log_in(request):
             login(request, user)
             # ===quiz admin login==
             if user.is_staff:
-                request.session.set_expiry(600) # its made log out after 10 minutes
+                request.session.set_expiry(900) # its made log out after 15 minutes
                 messages.success(request,'Login successfully')
                 return redirect('admin_dash')
             else:
                 if User.objects.filter(username = username).exists():
-                    request.session.set_expiry(600) # its made log out after 10 minutes
+                    request.session.set_expiry(900) # its made log out after 15 minutes
                     messages.success(request,'Login successfully')
                     return redirect('home')
 
