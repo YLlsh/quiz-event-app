@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Admin Dashboard</title>
@@ -8,367 +9,436 @@
 
 <body class="bg-gray-100 min-h-screen">
 
-<!-- Header -->
+    <!-- Header -->
+    <!-- Header -->
 <header class="bg-indigo-600 text-white p-4 flex justify-between items-center">
     <h1 class="text-lg font-bold">Admin Dashboard</h1>
-    <a href="{% url 'log_out' %}">
-        <button type="button"
-                class="px-4 py-2 bg-red-500 hover:bg-red-600 rounded-lg text-white font-medium">
-            Logout
+
+    <div class="flex items-center gap-4">
+        <!-- Quiz History Button -->
+        <button onclick="openModal('historyModal')"
+            class="px-4 py-2 bg-white text-indigo-600 font-semibold rounded-lg shadow hover:bg-gray-100">
+            📊 Quiz History
         </button>
-    </a>
+
+        <!-- Logout -->
+        <a href="{% url 'log_out' %}">
+            <button type="button"
+                class="px-4 py-2 bg-red-500 hover:bg-red-600 rounded-lg text-white font-medium">
+                Logout
+            </button>
+        </a>
+    </div>
 </header>
 
-<!-- Main -->
-<main class="p-8 max-w-6xl mx-auto">
 
-  {% if messages %}
-    {% for message in messages %}
-      <div class="alert alert-success">{{ message }}</div>
-    {% endfor %}
-  {% endif %}
-
-  <!-- Buttons -->
-  <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
-      <button onclick="openModal('quizModal')"
-              class="bg-white shadow rounded-xl p-6 hover:shadow-lg">
-          ➕ Add Quiz
-      </button>
-
-      <button onclick="openModal('questionModal')"
-              class="bg-white shadow rounded-xl p-6 hover:shadow-lg">
-          ❓ Add Question
-      </button>
-
-      <button onclick="openModal('eventModal')"
-              class="bg-white shadow rounded-xl p-6 hover:shadow-lg">
-          📅 Add Event
-      </button>
-  </div>
-</main>
-
-<!-- ================= ADD QUIZ MODAL ================= -->
-<div id="quizModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-    <div class="bg-white rounded-2xl w-full max-w-md p-6">
-        <h2 class="text-xl font-bold mb-4">Add Quiz</h2>
-        <form method="post" action="{% url 'add_quiz' %}">
-            {% csrf_token %}
-            <input type="text" name="quiz_name" required
-                   placeholder="Enter Quiz Name"
-                   class="w-full border rounded-lg px-4 py-3 mb-4">
-
-            <input type="text" name="description" required
-                   placeholder="Enter description"
-                   class="w-full border rounded-lg px-4 py-3 mb-4">
-
-            <div class="flex justify-end gap-3">
-                <button type="button" onclick="closeModal('quizModal')"
-                        class="px-4 py-2 bg-gray-200 rounded-lg">
-                    Cancel
-                </button>
-                <button type="submit"
-                        class="px-4 py-2 bg-indigo-600 text-white rounded-lg">
-                    Save
-                </button>
-            </div>
-        </form>
-    </div>
-</div>
-
-<!-- ================= ADD QUESTION MODAL ================= -->
-<div id="questionModal" class="hidden fixed inset-0 bg-black bg-opacity-50 overflow-y-auto flex justify-center pt-10">
-    <div class="bg-white rounded-2xl w-full max-w-3xl p-6 mb-10">
-        <h2 class="text-xl font-bold mb-1">Add Question</h2>
-
-        <div id="questionError"
-            class="hidden mb-4 p-3 rounded-lg bg-red-100 text-red-700 text-sm font-medium">
-            Please select at least one correct answer.
+    <!-- Main -->
+    <main class="p-8 max-w-6xl mx-auto">
+        {% if messages %}
+        {% for message in messages %}
+        <div class="mb-4 px-4 py-3 rounded-lg border
+        {% if message.tags == 'success' %}
+            bg-green-100 border-green-400 text-green-700
+        {% elif message.tags == 'error' %}
+            bg-red-100 border-red-400 text-red-700
+        {% elif message.tags == 'warning' %}
+            bg-yellow-100 border-yellow-400 text-yellow-700
+        {% else %}
+            bg-blue-100 border-blue-400 text-blue-700
+        {% endif %}">
+            {{ message }}
         </div>
+        {% endfor %}
+        {% endif %}
 
-        <form method="post" action="{% url 'add_question' %}" id="questionForm">
-            {% csrf_token %}
 
-            <!-- Select Quiz -->
-            <select name="quiz_id" required class="w-full border rounded-lg px-4 py-3 mb-4">
-                <option value="">Select Quiz</option>
-                {% for quiz in quiz_data %}
+
+        <!-- Buttons -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+            <button onclick="openModal('quizModal')" class="bg-white shadow rounded-xl p-6 hover:shadow-lg">
+                ➕ Add Quiz
+            </button>
+
+            <button onclick="openModal('questionModal')" class="bg-white shadow rounded-xl p-6 hover:shadow-lg">
+                ❓ Add Question
+            </button>
+
+            <button onclick="openModal('eventModal')" class="bg-white shadow rounded-xl p-6 hover:shadow-lg">
+                📅 Add Event
+            </button>
+        </div>
+    </main>
+
+    <!-- ================= ADD QUIZ MODAL ================= -->
+    <div id="quizModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+        <div class="bg-white rounded-2xl w-full max-w-md p-6">
+            <h2 class="text-xl font-bold mb-4">Add Quiz</h2>
+            <form method="post" action="{% url 'add_quiz' %}">
+                {% csrf_token %}
+                <input type="text" name="quiz_name" required placeholder="Enter Quiz Name"
+                    class="w-full border rounded-lg px-4 py-3 mb-4">
+
+                <input type="text" name="description" required placeholder="Enter description"
+                    class="w-full border rounded-lg px-4 py-3 mb-4">
+
+                <div class="flex justify-end gap-3">
+                    <button type="button" onclick="closeModal('quizModal')" class="px-4 py-2 bg-gray-200 rounded-lg">
+                        Cancel
+                    </button>
+                    <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-lg">
+                        Save
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ================= ADD QUESTION MODAL ================= -->
+    <div id="questionModal"
+        class="hidden fixed inset-0 bg-black bg-opacity-50 overflow-y-auto flex justify-center pt-10">
+        <div class="bg-white rounded-2xl w-full max-w-3xl p-6 mb-10">
+            <h2 class="text-xl font-bold mb-1">Add Question</h2>
+
+            <div id="questionError" class="hidden mb-4 p-3 rounded-lg bg-red-100 text-red-700 text-sm font-medium">
+                Please select at least one correct answer.
+            </div>
+
+            <form method="post" action="{% url 'add_question' %}" id="questionForm">
+                {% csrf_token %}
+
+                <!-- Select Quiz -->
+                <select name="quiz_id" required class="w-full border rounded-lg px-4 py-3 mb-4">
+                    <option value="">Select Quiz</option>
+                    {% for quiz in quiz_data %}
                     <option value="{{ quiz.id }}">{{ quiz.title }}</option>
-                {% endfor %}
-            </select>
+                    {% endfor %}
+                </select>
 
-            <!-- Select Question Type -->
-            <select name="q_type" required class="w-full border rounded-lg px-4 py-3 mb-4">
-                <option value="">Select Question Type</option>
-                <option value="MCQ">MCQ</option>
-                <option value="TF">True/False</option>
-            </select>
+                <!-- Select Question Type -->
+                <select name="q_type" required class="w-full border rounded-lg px-4 py-3 mb-4">
+                    <option value="">Select Question Type</option>
+                    <option value="MCQ">MCQ</option>
+                    <option value="TF">True/False</option>
+                </select>
 
-            <!-- Question -->
-            <textarea name="question"
-                      placeholder="Enter Question"
-                      class="w-full border rounded-lg px-4 py-3 mb-4"
-                      required></textarea>
+                <!-- Question -->
+                <textarea name="question" placeholder="Enter Question" class="w-full border rounded-lg px-4 py-3 mb-4"
+                    required></textarea>
 
-            <!-- Answers -->
-            <div id="answersContainer" class="space-y-3">
-                <div class="flex items-center gap-3 answer-item">
-                    <input type="hidden" name="correct_answer[]" value="0">
-                    <input type="radio" name="select_correct" class="correct-radio">
-                    <input type="text" name="answers[]" placeholder="Answer option" class="w-full border rounded-lg px-3 py-2" required>
+                <!-- Answers -->
+                <div id="answersContainer" class="space-y-3">
+                    <div class="flex items-center gap-3 answer-item">
+                        <input type="hidden" name="correct_answer[]" value="0">
+                        <input type="radio" name="select_correct" class="correct-radio">
+                        <input type="text" name="answers[]" placeholder="Answer option"
+                            class="w-full border rounded-lg px-3 py-2" required>
+                    </div>
+                </div>
+
+
+                <!-- Add Answer Button -->
+                <button type="button" onclick="addAnswer()" class="mt-4 text-indigo-600 font-medium">
+                    ➕ Add Answer
+                </button>
+
+                <!-- Footer -->
+                <div class="flex justify-end mt-6 gap-3">
+                    <button type="button" onclick="closeModal('questionModal')"
+                        class="px-4 py-2 bg-gray-200 rounded-lg">
+                        Close
+                    </button>
+                    <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded-lg">
+                        Save Question
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ================= ADD EVENT MODAL ================= -->
+    <div id="eventModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+        <div class="bg-white rounded-2xl w-full max-w-md p-6">
+            <h2 class="text-xl font-bold mb-4">Add Event</h2>
+            <form method="post" action="{% url 'add_event' %}">
+                {% csrf_token %}
+                <input type="text" name="title" required placeholder="Event Title"
+                    class="w-full border rounded-lg px-4 py-3 mb-3" required>
+
+                <input type="text" name="description" placeholder="Event Description"
+                    class="w-full border rounded-lg px-4 py-3 mb-4" required>
+
+                <input type="date" name="date" required class="w-full border rounded-lg px-4 py-3 mb-3">
+
+                <input type="text" name="location" required placeholder="Event Location"
+                    class="w-full border rounded-lg px-4 py-3 mb-3">
+
+
+                <div class="flex justify-end gap-3">
+                    <button type="button" onclick="closeModal('eventModal')" class="px-4 py-2 bg-gray-200 rounded-lg">
+                        Cancel
+                    </button>
+                    <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-lg">
+                        Save Event
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- ================= DATA TABLES ================= -->
+    <!-- ================= DATA TABLES (ROW) ================= -->
+    <section class="mt-12">
+
+        <div class="flex flex-wrap gap-6">
+
+            <!-- ================= QUIZ TABLE ================= -->
+            <div class="flex-1 min-w-[300px] bg-white rounded-xl shadow p-5">
+                <h2 class="text-lg font-bold mb-4">📘 Quiz List</h2>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm border-collapse">
+                        <thead>
+                            <tr class="bg-gray-100 text-left">
+                                <th class="p-2 border">#</th>
+                                <th class="p-2 border">Quiz</th>
+                                <th class="p-2 border">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for quiz in quiz_data %}
+                            <tr class="hover:bg-gray-50">
+                                <td class="p-2 border">{{ forloop.counter }}</td>
+                                <td class="p-2 border">{{ quiz.title }}</td>
+                                <td class="p-2 border"><a href="{% url 'delete_quiz' quiz.id %}"
+                                        class="inline-block bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-semibold transition duration-200">
+                                        Delete
+                                    </a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="2" class="p-3 text-center text-gray-500">
+                                    No quiz found
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
             </div>
 
-            
-            <!-- Add Answer Button -->
-            <button type="button" onclick="addAnswer()"
-                    class="mt-4 text-indigo-600 font-medium">
-                ➕ Add Answer
-            </button>
+            <!-- ================= QUESTION TABLE ================= -->
+            <div class="flex-1 min-w-[300px] bg-white rounded-xl shadow p-5">
+                <h2 class="text-lg font-bold mb-4">❓ Questions</h2>
 
-            <!-- Footer -->
-            <div class="flex justify-end mt-6 gap-3">
-                <button type="button" onclick="closeModal('questionModal')"
-                        class="px-4 py-2 bg-gray-200 rounded-lg">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm border-collapse">
+                        <thead>
+                            <tr class="bg-gray-100 text-left">
+                                <th class="p-2 border">#</th>
+                                <th class="p-2 border">Question</th>
+                                <th class="p-2 border">Quiz</th>
+                                <th class="p-2 border">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for q in question_data %}
+                            <tr class="hover:bg-gray-50">
+                                <td class="p-2 border">{{ forloop.counter }}</td>
+                                <td class="p-2 border">{{ q.text }}</td>
+                                <td class="p-2 border">{{ q.quiz.title }}</td>
+                                <td class="p-2 border"><a href="{% url 'delete_question' q.id %}"
+                                        class="inline-block bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-semibold transition duration-200">
+                                        Delete
+                                    </a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="2" class="p-3 text-center text-gray-500">
+                                    No questions found
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ================= EVENT TABLE ================= -->
+            <div class="flex-1 min-w-[300px] bg-white rounded-xl shadow p-5">
+                <h2 class="text-lg font-bold mb-4">📅 Events</h2>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm border-collapse">
+                        <thead>
+                            <tr class="bg-gray-100 text-left">
+                                <th class="p-2 border">#</th>
+                                <th class="p-2 border">Title</th>
+                                <th class="p-2 border">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for event in event_data %}
+                            <tr class="hover:bg-gray-50">
+                                <td class="p-2 border">{{ forloop.counter }}</td>
+                                <td class="p-2 border">{{ event.title }}</td>
+                                <td class="p-2 border"><a href="{% url 'delete_event' event.id %}"
+                                        class="inline-block bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-semibold transition duration-200">
+                                        Delete
+                                    </a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="2" class="p-3 text-center text-gray-500">
+                                    No events found
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+ <div id="historyModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+        <div class="bg-white rounded-2xl w-full max-w-4xl p-6">
+
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold">📊 Quiz History</h2>
+                <button onclick="closeModal('historyModal')" class="text-xl font-bold">✖</button>
+            </div>
+
+            <div class="max-h-[400px] overflow-y-auto border rounded-lg">
+                <table class="w-full text-sm border-collapse">
+                    <thead class="sticky top-0 bg-gray-100">
+                        <tr>
+                            <th class="p-2 border">#</th>
+                            <th class="p-2 border">User</th>
+                            <th class="p-2 border">Quiz</th>
+                            <th class="p-2 border">Score</th>
+                            <th class="p-2 border">Submitted At</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for h in quiz_history %}
+                        <tr class="hover:bg-gray-50">
+                            <td class="p-2 border">{{ forloop.counter }}</td>
+                            <td class="p-2 border">{{ h.user_name }}</td>
+                            <td class="p-2 border">{{ h.quiz.title }}</td>
+                            <td class="p-2 border font-semibold">{{ h.score }}</td>
+                            <td class="p-2 border">{{ h.submitted_at }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="p-4 text-center text-gray-500">
+                                No quiz history found
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="flex justify-end mt-4">
+                <button onclick="closeModal('historyModal')" class="px-4 py-2 bg-gray-200 rounded-lg">
                     Close
                 </button>
-                <button type="submit"
-                        class="px-4 py-2 bg-green-600 text-white rounded-lg">
-                    Save Question
-                </button>
             </div>
-        </form>
-    </div>
-</div>
 
-<!-- ================= ADD EVENT MODAL ================= -->
-<div id="eventModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-    <div class="bg-white rounded-2xl w-full max-w-md p-6">
-        <h2 class="text-xl font-bold mb-4">Add Event</h2>
-        <form method="post" action="{% url 'add_event' %}">
-            {% csrf_token %}
-            <input type="text" name="title" required
-                   placeholder="Event Title"
-                   class="w-full border rounded-lg px-4 py-3 mb-3" required>
-            
-            <input type="text" name="description"
-                   placeholder="Event Description"
-                   class="w-full border rounded-lg px-4 py-3 mb-4" required>
-
-            <input type="date" name="date" required
-                   class="w-full border rounded-lg px-4 py-3 mb-3">
-
-            <input type="text" name="location" required
-                   placeholder="Event Location"
-                   class="w-full border rounded-lg px-4 py-3 mb-3">
-
-
-            <div class="flex justify-end gap-3">
-                <button type="button" onclick="closeModal('eventModal')"
-                        class="px-4 py-2 bg-gray-200 rounded-lg">
-                    Cancel
-                </button>
-                <button type="submit"
-                        class="px-4 py-2 bg-indigo-600 text-white rounded-lg">
-                    Save Event
-                </button>
-            </div>
-        </form>
-    </div>
-</div>
-<!-- ================= DATA TABLES ================= -->
-<!-- ================= DATA TABLES (ROW) ================= -->
-<section class="mt-12">
-
-    <div class="flex flex-wrap gap-6">
-
-        <!-- ================= QUIZ TABLE ================= -->
-        <div class="flex-1 min-w-[300px] bg-white rounded-xl shadow p-5">
-            <h2 class="text-lg font-bold mb-4">📘 Quiz List</h2>
-
-            <div class="overflow-x-auto">
-                <table class="w-full text-sm border-collapse">
-                    <thead>
-                        <tr class="bg-gray-100 text-left">
-                            <th class="p-2 border">#</th>
-                            <th class="p-2 border">Quiz</th>
-                            <th class="p-2 border">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for quiz in quiz_data %}
-                        <tr class="hover:bg-gray-50">
-                            <td class="p-2 border">{{ forloop.counter }}</td>
-                            <td class="p-2 border">{{ quiz.title }}</td>
-                            <td class="p-2 border">{{ quiz.title }}</td>
-                        </tr>
-                        {% empty %}
-                        <tr>
-                            <td colspan="2" class="p-3 text-center text-gray-500">
-                                No quiz found
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
         </div>
-
-        <!-- ================= QUESTION TABLE ================= -->
-        <div class="flex-1 min-w-[300px] bg-white rounded-xl shadow p-5">
-            <h2 class="text-lg font-bold mb-4">❓ Questions</h2>
-
-            <div class="overflow-x-auto">
-                <table class="w-full text-sm border-collapse">
-                    <thead>
-                        <tr class="bg-gray-100 text-left">
-                            <th class="p-2 border">#</th>
-                            <th class="p-2 border">Question</th>
-                            <th class="p-2 border">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for q in question_data %}
-                        <tr class="hover:bg-gray-50">
-                            <td class="p-2 border">{{ forloop.counter }}</td>
-                            <td class="p-2 border">{{ q.text }}</td>
-                            <td class="p-2 border">{{ q.text }}</td>
-                        </tr>
-                        {% empty %}
-                        <tr>
-                            <td colspan="2" class="p-3 text-center text-gray-500">
-                                No questions found
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- ================= EVENT TABLE ================= -->
-        <div class="flex-1 min-w-[300px] bg-white rounded-xl shadow p-5">
-            <h2 class="text-lg font-bold mb-4">📅 Events</h2>
-
-            <div class="overflow-x-auto">
-                <table class="w-full text-sm border-collapse">
-                    <thead>
-                        <tr class="bg-gray-100 text-left">
-                            <th class="p-2 border">#</th>
-                            <th class="p-2 border">Title</th>
-                            <th class="p-2 border">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for event in event_data %}
-                        <tr class="hover:bg-gray-50">
-                            <td class="p-2 border">{{ forloop.counter }}</td>
-                            <td class="p-2 border">{{ event.title }}</td>
-                            <td class="p-2 border">{{ event.title }}</td>
-                        </tr>
-                        {% empty %}
-                        <tr>
-                            <td colspan="2" class="p-3 text-center text-gray-500">
-                                No events found
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
     </div>
-</section>
 
+    <!-- ================= SCRIPT ================= -->
+    <script>
+        /* ================= OPEN / CLOSE MODALS ================= */
+        function openModal(id) {
+            document.getElementById(id).classList.remove("hidden");
+        }
 
+        function closeModal(id) {
+            document.getElementById(id).classList.add("hidden");
+        }
 
-<!-- ================= SCRIPT ================= -->
-<script>
-/* ================= OPEN / CLOSE MODALS ================= */
-function openModal(id) {
-    document.getElementById(id).classList.remove("hidden");
-}
+        /* ================= ELEMENTS ================= */
+        const qTypeSelect = document.querySelector('select[name="q_type"]');
+        const answersContainer = document.getElementById("answersContainer");
+        const errorBox = document.getElementById("questionError");
 
-function closeModal(id) {
-    document.getElementById(id).classList.add("hidden");
-}
+        /* ================= ADD ANSWER FUNCTION (MCQ) ================= */
+        let answerIndex = 1;
+        function addAnswer() {
+            const div = document.createElement("div");
+            div.className = "flex items-center gap-3 answer-item";
 
-/* ================= ELEMENTS ================= */
-const qTypeSelect = document.querySelector('select[name="q_type"]');
-const answersContainer = document.getElementById("answersContainer");
-const errorBox = document.getElementById("questionError");
-
-/* ================= ADD ANSWER FUNCTION (MCQ) ================= */
-let answerIndex = 1;
-function addAnswer() {
-    const div = document.createElement("div");
-    div.className = "flex items-center gap-3 answer-item";
-
-    div.innerHTML = `
+            div.innerHTML = `
         <input type="hidden" name="correct_answer[]" value="0">
         <input type="radio" name="select_correct" class="correct-radio">
         <input type="text" name="answers[]" placeholder="Answer option" class="w-full border rounded-lg px-3 py-2" required>
     `;
 
-    answersContainer.appendChild(div);
-    answerIndex++;
-}
+            answersContainer.appendChild(div);
+            answerIndex++;
+        }
 
-/* ================= SHOW/HIDE ANSWERS BASED ON QUESTION TYPE ================= */
-qTypeSelect.addEventListener('change', function() {
-    const type = this.value;
-    answersContainer.innerHTML = ''; // clear previous answers
+        /* ================= SHOW/HIDE ANSWERS BASED ON QUESTION TYPE ================= */
+        qTypeSelect.addEventListener('change', function () {
+            const type = this.value;
+            answersContainer.innerHTML = ''; // clear previous answers
 
-    if (type === "MCQ") {
-        // Show one empty answer input
-        addAnswer();
-        document.getElementById("addAnswerBtn")?.classList.remove("hidden"); // show Add Answer button
-    } else if (type === "TF") {
-        // Show only True/False read-only options
-        ["True", "False"].forEach((val) => {
-            const div = document.createElement("div");
-            div.className = "flex items-center gap-3 answer-item";
-            div.innerHTML = `
+            if (type === "MCQ") {
+                // Show one empty answer input
+                addAnswer();
+                document.getElementById("addAnswerBtn")?.classList.remove("hidden"); // show Add Answer button
+            } else if (type === "TF") {
+                // Show only True/False read-only options
+                ["True", "False"].forEach((val) => {
+                    const div = document.createElement("div");
+                    div.className = "flex items-center gap-3 answer-item";
+                    div.innerHTML = `
                 <input type="hidden" name="correct_answer[]" value="0">
                 <input type="radio" name="select_correct" class="correct-radio">
                 <input type="text" name="answers[]" value="${val}" readonly class="w-full border rounded-lg px-3 py-2 bg-gray-100 cursor-not-allowed">
             `;
-            answersContainer.appendChild(div);
+                    answersContainer.appendChild(div);
+                });
+                document.getElementById("addAnswerBtn")?.classList.add("hidden"); // hide Add Answer button
+            }
         });
-        document.getElementById("addAnswerBtn")?.classList.add("hidden"); // hide Add Answer button
-    }
-});
 
-/* ================= VALIDATE FORM ON SUBMIT ================= */
-document.getElementById('questionForm').addEventListener('submit', function (e) {
-    const radios = document.querySelectorAll('.correct-radio');
+        /* ================= VALIDATE FORM ON SUBMIT ================= */
+        document.getElementById('questionForm').addEventListener('submit', function (e) {
+            const radios = document.querySelectorAll('.correct-radio');
 
-    let oneChecked = false;
-    radios.forEach((radio) => { if (radio.checked) oneChecked = true; });
+            let oneChecked = false;
+            radios.forEach((radio) => { if (radio.checked) oneChecked = true; });
 
-    if (!oneChecked) {
-        e.preventDefault();
-        errorBox.classList.remove('hidden');
-        errorBox.scrollIntoView({ behavior: "smooth", block: "start" });
-        return;
-    }
+            if (!oneChecked) {
+                e.preventDefault();
+                errorBox.classList.remove('hidden');
+                errorBox.scrollIntoView({ behavior: "smooth", block: "start" });
+                return;
+            }
 
-    errorBox.classList.add('hidden');
+            errorBox.classList.add('hidden');
 
-    radios.forEach((radio) => {
-        const hiddenInput = radio.parentElement.querySelector('input[type="hidden"]');
-        hiddenInput.value = radio.checked ? "1" : "0";
-    });
-});
+            radios.forEach((radio) => {
+                const hiddenInput = radio.parentElement.querySelector('input[type="hidden"]');
+                hiddenInput.value = radio.checked ? "1" : "0";
+            });
+        });
 
-/* ================= HIDE ERROR WHEN RADIO CLICKED ================= */
-answersContainer.addEventListener('change', function(e) {
-    if (e.target.classList.contains('correct-radio')) {
-        errorBox.classList.add('hidden');
-    }
-});
-</script>
+        /* ================= HIDE ERROR WHEN RADIO CLICKED ================= */
+        answersContainer.addEventListener('change', function (e) {
+            if (e.target.classList.contains('correct-radio')) {
+                errorBox.classList.add('hidden');
+            }
+        });
+    </script>
 
 
 </body>
+
 </html>

@@ -31,9 +31,15 @@ urlpatterns = [
     path('add_question/',add_question,name="add_question"),
     path('add_event/',add_event,name="add_event"),
 
+    path('sign_up/',sign_up,name="sign_up"),
     path('login/',log_in,name="login"),
     path('admin_dash/',admin_dash,name="admin_dash"),
     path('log_out/',log_out,name="log_out"),
+
+
+    path('delete_quiz/<int:id>/',delete_quiz,name="delete_quiz"),
+    path('delete_question/<int:id>/',delete_question,name="delete_question"),
+    path('delete_event/<int:id>/',delete_event,name="delete_event"),
 
 
 ]
